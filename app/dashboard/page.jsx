@@ -10,7 +10,9 @@ import {
   UserCircleIcon,
   PlusIcon,
   XMarkIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  Cog6ToothIcon,
+  UserIcon
 } from '@heroicons/react/24/outline';
 
 // Sample event data
@@ -46,6 +48,7 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isManagingEvent, setIsManagingEvent] = useState(false);
   const [newEvent, setNewEvent] = useState({
     name: "",
     date: "",
@@ -145,6 +148,15 @@ export default function Dashboard() {
     }
   };
 
+  const calculateRemainingSpaces = (ticket) => {
+    const purchasedQuantity = ticket.purchases?.reduce((sum, purchase) => sum + purchase.quantity, 0) || 0;
+    return ticket.spaces - purchasedQuantity;
+  };
+
+  const calculateTotalAttendees = (ticket) => {
+    return ticket.purchases?.reduce((sum, purchase) => sum + purchase.quantity, 0) || 0;
+  };
+
   if (status === "loading") {
     return (
       <div className="flex w-full min-h-screen bg-gray-50">
@@ -230,7 +242,7 @@ export default function Dashboard() {
                       <div className="text-sm font-medium text-gray-900">{event.name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{event.date}</div>
+                      <div className="text-sm text-gray-600">{new Date(event.date).toLocaleDateString()}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-600">{event.startTime} - {event.endTime}</div>
@@ -251,23 +263,26 @@ export default function Dashboard() {
                       <div className="space-y-1">
                         {event.tickets.map((ticket, index) => (
                           <div key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-lime-100 text-lime-800 mr-2">
-                            {ticket.name} ({ticket.spaces} spaces)
+                            {ticket.name} ({calculateRemainingSpaces(ticket)}/{ticket.spaces} remaining)
                           </div>
                         ))}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => setSelectedEvent(event)}
-                          className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-lime-100 text-lime-800 hover:bg-lime-200 transition-colors duration-200"
+                          onClick={() => {
+                            setSelectedEvent(event);
+                            setIsManagingEvent(true);
+                          }}
+                          className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors duration-200"
                         >
-                          <InformationCircleIcon className="h-4 w-4 mr-1" />
-                          View
+                          <Cog6ToothIcon className="h-4 w-4 mr-1" />
+                          Manage
                         </button>
                         <button
                           onClick={() => handleDeleteEvent(event.id)}
-                          className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 hover:bg-red-200 transition-colors duration-200"
+                          className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-red-100 text-red-800 hover:bg-red-200 transition-colors duration-200"
                         >
                           <XMarkIcon className="h-4 w-4 mr-1" />
                           Delete
@@ -281,16 +296,16 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Event Details Modal */}
-        {selectedEvent && (
+        {/* Event Management Modal */}
+        {isManagingEvent && selectedEvent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 opacity-100">
+            <div className="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">{selectedEvent.name}</h2>
                   <div className="mt-1 flex items-center space-x-2">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-lime-100 text-lime-800">
-                      {selectedEvent.date}
+                      {new Date(selectedEvent.date).toLocaleDateString()}
                     </span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-lime-100 text-lime-800">
                       {selectedEvent.startTime} - {selectedEvent.endTime}
@@ -298,32 +313,79 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedEvent(null)}
+                  onClick={() => {
+                    setIsManagingEvent(false);
+                    setSelectedEvent(null);
+                  }}
                   className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
                 >
                   <XMarkIcon className="h-6 w-6" />
                 </button>
               </div>
+
               <div className="space-y-6">
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Event Details</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{selectedEvent.details}</p>
+                {/* Event Statistics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Tickets</h3>
+                    <p className="text-3xl font-bold text-lime-600">
+                      {selectedEvent.tickets.reduce((sum, ticket) => sum + ticket.spaces, 0)}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Sold</h3>
+                    <p className="text-3xl font-bold text-blue-600">
+                      {selectedEvent.tickets.reduce((sum, ticket) => sum + calculateTotalAttendees(ticket), 0)}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Remaining</h3>
+                    <p className="text-3xl font-bold text-gray-600">
+                      {selectedEvent.tickets.reduce((sum, ticket) => sum + calculateRemainingSpaces(ticket), 0)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Available Tickets</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedEvent.tickets.map((ticket, index) => (
-                      <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <div className="flex items-center justify-between">
-                          <span className="text-lg font-medium text-gray-900">{ticket.name}</span>
-                          <span className="text-sm text-gray-500">{ticket.spaces} spaces</span>
+
+                {/* Ticket Details */}
+                <div className="bg-white rounded-xl p-6 border border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Ticket Details</h3>
+                  <div className="space-y-4">
+                    {selectedEvent.tickets.map((ticket) => (
+                      <div key={ticket.id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="text-lg font-medium text-gray-900">{ticket.name}</h4>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-500">
+                              {calculateRemainingSpaces(ticket)}/{ticket.spaces} remaining
+                            </span>
+                            <div className="w-32 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-lime-500 h-2 rounded-full" 
+                                style={{ width: `${(calculateRemainingSpaces(ticket) / ticket.spaces) * 100}%` }}
+                              ></div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="mt-2">
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-lime-500 h-2 rounded-full" 
-                              style={{ width: `${(ticket.spaces / 100) * 100}%` }}
-                            ></div>
+                        
+                        {/* Attendees List */}
+                        <div className="mt-4">
+                          <h5 className="text-sm font-medium text-gray-700 mb-2">Attendees ({calculateTotalAttendees(ticket)})</h5>
+                          <div className="space-y-2">
+                            {ticket.purchases?.map((purchase) => (
+                              <div key={purchase.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                                <div className="flex flex-col">
+                                  <div className="flex items-center">
+                                    <UserIcon className="h-5 w-5 text-gray-400 mr-2" />
+                                    <span className="text-sm font-medium text-gray-900">{purchase.user?.name || 'Unknown User'}</span>
+                                  </div>
+                                  <span className="text-sm text-gray-500 ml-7">{purchase.user?.email || 'No email provided'}</span>
+                                </div>
+                                <span className="text-sm font-medium text-gray-900">{purchase.quantity} tickets</span>
+                              </div>
+                            ))}
+                            {(!ticket.purchases || ticket.purchases.length === 0) && (
+                              <p className="text-sm text-gray-500">No attendees yet</p>
+                            )}
                           </div>
                         </div>
                       </div>

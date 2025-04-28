@@ -13,6 +13,10 @@ model User {
   email          String  @unique
   password       String
   profilePicture String?
+  role           String  @default("CODER") // "ADMIN" or "CODER"
+  purchases      TicketPurchase[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Course {
@@ -50,6 +54,18 @@ model Ticket {
   spaces    Int
   eventId   String
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  purchases TicketPurchase[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TicketPurchase {
+  id        String   @id @default(uuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
