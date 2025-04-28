@@ -7,12 +7,15 @@ const prisma = new PrismaClient();
 export async function POST(request) {
   try {
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    console.log(token)
 
     if (!token) {
+      console.log('no token')
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
     const userId = token.id;
+    console.log(userId)
 
     const body = await request.json();
     const { ticketId, quantity } = body;
