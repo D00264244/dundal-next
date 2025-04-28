@@ -1,4 +1,4 @@
-import { PrismaAdapter } from "@auth/prisma-adapter"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
@@ -36,7 +36,7 @@ export const authOptions = {
                 if (!isCorrectPassword) {
                     throw new Error("Invalid credentials")
                 }
-
+                console.log("user", user)
                 return user
             }
         })

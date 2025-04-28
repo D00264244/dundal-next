@@ -2,6 +2,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import axios from "axios";
+import Image from "next/image";
+import codeClubLogo from "@/public/img/code_club_logo.jpg";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -66,6 +68,15 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div className="flex justify-center">
+          <Image
+            className="text-center"
+            src={codeClubLogo}
+            alt="Code Club Logo"
+            width={100}
+            height={100}
+          />
+        </div>
         <h1 className="text-2xl font-bold text-center mb-6">
           Create an Account
         </h1>

@@ -4,44 +4,16 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import codeClubLogo from "@/public/img/code_club_logo.jpg";
 import Link from "next/link";
+import Sidebar from "@/components/Sidebar";
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [courses, setCourses] = useState([]);
-  const navItems = [
-    {
-      path: "/",
-      pathname: "Home",
-    },
-    {
-      path: "/scratch",
-      pathname: "Scratch",
-    },
-    {
-      path: "/python",
-      pathname: "Python",
-    },
-    {
-      path: "/web",
-      pathname: "Web",
-    },
-    {
-      path: "/signup",
-      pathname: "Signup",
-    },
-    {
-      path: "/login",
-      pathname: "Login",
-    },
-  ];
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get("/api/courses");
-
-        console.log("API Response:", response.data);
-
+        // console.log("API Response:", response.data);
         setCourses(
           Array.isArray(response.data.courses) ? response.data.courses : []
         );
@@ -56,26 +28,7 @@ export default function Home() {
 
   return (
     <div className="container_ flex w-full">
-      <div className="div">
-        <nav className="hidden  lg:flex flex-col items-start bg-white shadow-md p-4  h-screen sticky top-0 left-0  w-64">
-          <Image
-            src={codeClubLogo}
-            alt="Code Club Logo"
-            width={48}
-            height={48}
-            className="rounded-xl"
-          />
-          {navItems.map((item, index) => (
-            <Link
-              href={item.path}
-              key={index}
-              className="block px-4 py-2 text-black hover:bg-lime-300 transition duration-200"
-            >
-              {item.pathname}
-            </Link>
-          ))}
-        </nav>
-      </div>
+      <Sidebar />
       <div className="bg-lime-300 min-h-screen md:w-full">
         <header id="logo" className="container mx-auto rounded-xl">
           <div className="flex justify-between items-center px-4 py-3">
@@ -86,64 +39,8 @@ export default function Home() {
               height={48}
               className="rounded-xl md:flex lg:hidden"
             />
-
-            <nav className="lg:hidden hidden md:flex space-x-4">
-              {navItems.map((item, index) => (
-                <Link
-                  href={item.path}
-                  key={index}
-                  className="border-solid border-2 px-3 py-1 rounded-md border-black bg-white hover:bg-lime-300 transition-all duration-200"
-                >
-                  {item.pathname}
-                </Link>
-              ))}
-            </nav>
-
-            <button
-              id="menu-toggle"
-              className="md:hidden text-black focus:outline-none"
-              onClick={() => setMenuOpen(true)}
-            >
-              <svg
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="h-6 w-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
           </div>
         </header>
-
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="fixed inset-0 bg-black/50 z-10">
-            <div className="bg-white w-3/4 h-full p-4">
-              <button
-                id="menu-close"
-                className="mb-4 bg-red-700 text-white p-2 rounded-xl focus:outline-none"
-                onClick={() => setMenuOpen(false)}
-              >
-                Close
-              </button>
-              {["Home", "Scratch", "Python", "Web"].map((item, index) => (
-                <Link
-                  href={`/${item.toLowerCase()}`}
-                  key={index}
-                  className="block border-solid border-2 px-3 py-1 rounded-md border-black bg-white hover:bg-lime-300 mb-2 transition-all duration-200 ease-in-out"
-                >
-                  {item}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Main Content */}
         <main className="container mx-auto px-4 rounded-xl">
@@ -169,7 +66,7 @@ export default function Home() {
               {Array.isArray(courses) && courses.length > 0 ? (
                 courses.map((course, index) => (
                   <section
-                    key={course.id || index} // Use unique ID if available
+                    key={course.id || index}
                     className="p-5 bg-gray-200 rounded-md mx-2 text-center shadow-lg"
                   >
                     <Image
@@ -182,7 +79,7 @@ export default function Home() {
                       width={300}
                       height={200}
                       className="mx-auto w-full rounded-md"
-                      onError={(e) => (e.target.src = "/placeholder.jpg")} // Fallback if image fails to load
+                      onError={(e) => (e.target.src = "/placeholder.jpg")}
                     />
 
                     <div className="content p-4">

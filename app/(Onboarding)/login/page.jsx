@@ -4,6 +4,9 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import codeClubLogo from "@/public/img/code_club_logo.jpg";
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,7 +45,16 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+          <div className="max-w-md w-full space-y-8">
+      <div className="flex justify-center">
+          <Image
+            className="text-center"
+            src={codeClubLogo}
+            alt="Code Club Logo"
+            width={100}
+            height={100}
+          />
+        </div>
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
